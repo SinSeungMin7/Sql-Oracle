@@ -45,9 +45,10 @@ SELECT      EMPLOYEE_ID                      "사  번"    ,  -- 사번 : ALIAS,
     ORDER BY FIRST_NAME ASC, LAST_NAME ASC;
     
 -- 부서가 없는 직원을 출력
-SELECT      EMPLOYEE_ID, FIRST_NAME, LAST_NAME, DEPARTMENT_ID
-    FROM    EMPLOYEES
-    WHERE   DEPARTMENT_ID is NULL;
+SELECT      EMPLOYEE_ID,
+            FIRST_NAME || ' ' || LAST_NAME   ENAME
+    FROM    EMPLOYEES    
+    WHERE   DEPARTMENT_ID is NULL;   -- = NULL (작동 안함) / is null, is not null 2가지가 있다
     
     
     
