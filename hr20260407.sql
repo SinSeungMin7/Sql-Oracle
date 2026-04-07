@@ -283,7 +283,7 @@ ORDER BY 번호 ASC;
          first_name || ' ' || last_name 이름,
          hire_date                      입사년월
  FROM    EMPLOYEES
- WHERE   hire_date = '2017-02-07' 
+ WHERE   hire_date = '2017-02-07'  
  ORDER BY 번호 ASC;
  
  
@@ -331,7 +331,7 @@ SELECT    EMPLOYEE_ID,
           HIRE_DATE,
           TRUNC(SYSDATE - HIRE_DATE)
 FROM      EMPLOYEES
-WHERE     HIRE_DATE <= HIRE_DATE + 7
+WHERE     SYSDATE - HIRE_DATE <= 7
 ORDER BY  EMPLOYEE_ID ASC;
 
 
@@ -349,7 +349,7 @@ ORDER BY HIRE_DATE ASC;
 SELECT  employee_id                     사번,
         first_name || ' ' || last_name  이름,
         hire_date                       입사일
-FROM   EMPLOYEES
+FROM    EMPLOYEES
 WHERE TO_CHAR( HIRE_DATE, 'MM') = '08';
 
 
