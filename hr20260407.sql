@@ -364,10 +364,10 @@ ORDER BY 부서번호 ASC;
 -- 직원사번, 입사일
 -- 2026년 04월 07일 10시 05분 04초 오전 수요일
 -- 한자로 출력
-SELECT 
-FROM
-WHERE
-ORDER BY
+SELECT  employee_id                     사번,
+        first_name || ' ' || last_name  이름,
+       TO_CHAR( hire_date,'YYYY"年"-MM"月"-DD"日"HH:MI:SS AM DAY')입사일
+FROM    EMPLOYEES; 
 
 
 
