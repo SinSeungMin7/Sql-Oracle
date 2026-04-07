@@ -224,7 +224,7 @@ ORDER BY 번호 ASC;
  -------------------------------------------------------
  SELECT EMPLOYEE_ID, FIRST_NAME, HIRE_DATE
  FROM   EMPLOYEES;
- WHERE
+ 
  -- 날짜 26/04/07 : 표현법이 틀림 년/월/일 사용하지 않음 
  -- 2026-04-07    : ANSI 표준이다
  -- 04/13/26      : 월/일/년  -> 미국식
