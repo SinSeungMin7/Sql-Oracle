@@ -359,7 +359,7 @@ WHERE DEPARTMENT_ID NOT IN(50, 60, 80);
  부서별 사원수
  SELECT DEPARTMENT_ID        부서번호,
         COUNT( EMPLOYEE_ID ) 사원수
- FROM   EMPLOYEES; -- ORA-00937: 단일 그룹의 그룹 함수가 아닙니다
+ FROM   EMPLOYEES; -- ORA-00937: 단일 그룹의 그룹 함수가 아닙니다 
  
 
 
