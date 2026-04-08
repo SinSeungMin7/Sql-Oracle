@@ -353,29 +353,106 @@ SELECT COUNT(DEPARTMENT_id)   인원수,  -- 22 = ( 109 - ( 45 + 05 + 34 ) )-3(N
        SUM(SALARY)            월급합,  -- 194716
        ROUND(AVG(SALARY), 3)  월급평균 -- 8850.727
 FROM   EMPLOYEES
-WHERE DEPARTMENT_ID NOT IN(50, 60, 80);
+WHERE  DEPARTMENT_ID NOT IN(50, 60, 80);
 
 ----------------------------------------------------------------------------------
  부서별 사원수
  SELECT DEPARTMENT_ID        부서번호,
         COUNT( EMPLOYEE_ID ) 사원수
  FROM   EMPLOYEES; -- ORA-00937: 단일 그룹의 그룹 함수가 아닙니다 
+ -- GROUP BY 절이 필요하다
+ -- 일반칼럼과 집계함수를 동시에 사용하면 ~ 별 통계라고 해석이 된다.
  
  SELECT   DEPARTMENT_ID        부서번호,
           COUNT( EMPLOYEE_ID ) 사원수
  FROM     EMPLOYEES
- WHERE
- GROUP BY DEPARTMENT_ID
- HAVING
- ORDER BY
+ -- WHERE  : GROUP 을 만들기 '전' 조건
+ -- GROUP BY DEPARTMENT_ID
+ GROUP BY ROLLUP( DEPARTMENT_ID )
+ -- HAVING : GROUP을 만든 '후' 조건
+ ORDER BY DEPARTMENT_ID;
  
+ -- 부서별 월급합, 월급 평균을 구하시오
+SELECT   DEPARTMENT_ID          부서번호,
+         SUM(SALARY)            월급합,
+         ROUND(AVG(SALARY), 2)  월급평균
+FROM     EMPLOYEES
+GROUP BY DEPARTMENT_ID
+ORDER BY DEPARTMENT_ID;
+
+-- 부서별 사원수 통계
+SELECT    DEPARTMENT_ID      번호,
+          COUNT(employee_id) 사원수  -- 집계함수 사용
+FROM      EMPLOYEES
+GROUP BY  DEPARTMENT_ID              
+ORDER BY  DEPARTMENT_ID;
+
+-- 부서별 인원수 월급합
+SELECT   department_id      번호,
+         COUNT(employee_id) 사원수,
+         SUM(SALARY)        월급합
+FROM     EMPLOYEES
+GROUP BY DEPARTMENT_ID
+ORDER BY DEPARTMENT_ID;
+
+-- 부서별 인원수가 5명 이상인 부서번호
+SELECT    DEPARTMENT_ID      번호,
+          COUNT(employee_id) 사원수
+FROM      EMPLOYEES
+GROUP BY  DEPARTMENT_ID
+HAVING    COUNT(employee_id) >= 5
+ORDER BY  DEPARTMENT_ID;
+
+-- 부서별 월급총계가 20000이상인 부서번호
+SELECT   department_id      번호,
+         COUNT(employee_id) 사원수,
+         SUM(SALARY)        월급합
+FROM     EMPLOYEES
+GROUP BY DEPARTMENT_ID
+HAVING   SUM(SALARY) >= 20000
+ORDER BY DEPARTMENT_ID;
+
+-- JOB_ID 별 인원수
+SELECT    JOB_ID     ,
+          COUNT(EMPLOYEE_ID) 인원수
+FROM      EMPLOYEES
+GROUP BY  JOB_ID
+ORDER BY  JOB_ID;
+
+-- JOB_TITLE 별 인원수
+SELECT
+FROM
+
+-- 입사일 기준 월별 인원수, 2017년 기준
+SELECT   TO_CHAR(HIRE_DATE, 'MM')  입사일, 
+         COUNT(EMPLOYEE_ID)        인원수
+FROM     EMPLOYEES
+WHERE    TO_CHAR(HIRE_DATE, 'YYYY') = '2017'
+GROUP BY TO_CHAR(HIRE_DATE, 'MM')
+ORDER BY TO_CHAR(HIRE_DATE, 'MM');
+
+-- 부서별 최대월급이 14000 이상인 부서의 부서번호와 최대 월급
+SELECT   DEPARTMENT_ID  부서번호,
+         MAX(SALARY)    최대월급
+FROM     EMPLOYEES
+GROUP BY DEPARTMENT_ID
+HAVING   MAX(SALARY) >= 14000
+ORDER BY DEPARTMENT_ID;
+
+-- 부서별 모우고 같은부서는 직업별 인원수, 월급평균
+SELECT   department_id  부서번호, 
+         JOB_ID         직업별, -- JOB_TITLE
+         COUNT(JOB_ID)  인원수,
+         ROUND( AVG(salary), 3 ) 월급평균
+FROM     EMPLOYEES
+--GROUP BY DEPARTMENT_ID, JOB_ID
+--GROUP BY ROLLUP(DEPARTMENT_ID, JOB_ID)
+GROUP BY CUBE(DEPARTMENT_ID, JOB_ID)
+ORDER BY DEPARTMENT_ID, JOB_ID;
 
 
-
-
-
-
-
+-- ROLLUP : GROUP BY 절과 함께 쓰이며
+--          계층적인 요약 통계(소계 및 총계)를 자동으로 생성해주는 함수입니다.
 
 
 
