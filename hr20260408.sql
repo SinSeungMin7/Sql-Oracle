@@ -440,10 +440,47 @@ HAVING   MAX(SALARY) >= 14000
 ORDER BY DEPARTMENT_ID;
 
 -- 부서별 모우고 같은부서는 직업별 인원수, 월급평균
-SELECT   department_id  부서번호, 
-         JOB_ID         직업별, -- JOB_TITLE
+SELECT   department_id  부서번호, -- 부서명 
+         JOB_ID         직업별,   -- JOB_TITLE
          COUNT(JOB_ID)  인원수,
-         ROUND( AVG(salary), 3 ) 월급평균
+         ROUND( AVG(salary), 3 ) 월급평균,
+         DECODE(department_id,
+                            10,	 'Administration',
+                            20,	 'Marketing',
+                            30,	 'Purchasing',
+                            40,	 'Human Resources',
+                            50,	 'Shipping',
+                            60,	 'IT',
+                            70,	 'Public Relations',
+                            80,	 'Sales',
+                            90,	 'Executive',
+                            100, 'Finance',
+                            110, 'Accounting'
+                               , 'NULL 부서없음'
+       )                              부서명,
+       DECODE(JOB_ID,
+                    'AD_PRES',	'President',
+                    'AD_VP',	'Administration Vice President',
+                    'AD_ASST',	'Administration Assistant',
+                    'FI_MGR',	'Finance Manager',
+                    'FI_ACCOUNT',	'Accountant',
+                    'AC_MGR',	'Accounting Manager',
+                    'AC_ACCOUNT',	'Public Accountant',
+                    'SA_MAN',	'Sales Manager',
+                    'SA_REP',	'Sales Representative',
+                    'PU_MAN',	'Purchasing Manager',
+                    'PU_CLERK',	'Purchasing Clerk',
+                    'ST_MAN',	'Stock Manager',
+                    'ST_CLERK',	'Stock Clerk',
+                    'SH_CLERK',	'Shipping Clerk',
+                    'IT_PROG',	'Programmer',
+                    'MK_MAN',	'Marketing Manager',
+                    'MK_REP',	'Marketing Representative',
+                    'HR_REP',	'Human Resources Representative',
+                    'PR_REP',	'Public Relations Representative',
+                                'NULL 직업없음'
+                                )     직업명
+                 
 FROM     EMPLOYEES
 --GROUP BY DEPARTMENT_ID, JOB_ID
 --GROUP BY ROLLUP(DEPARTMENT_ID, JOB_ID)
