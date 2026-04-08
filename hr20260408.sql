@@ -65,10 +65,33 @@ WHERE    E.DEPARTMENT_ID <> 80; -- <>, != : 같지않다
 
 -- 2026년 04월 07일 10시 05분 04초 오전 수요일
 -- 한자로 출력
+
+
 -- 오전, 오후 : 午前, 午後 
 -- 년월일시분초 : 年, 月, 日, 時, 分, 秒
 -- 월화수목금토일 : 月, 火, 水, 木, 金, 土, 日
 -- 요일 : 曜日
+
+
+SELECT  TO_CHAR(SYSDATE, 'YYYY') || '年 '
+     || TO_CHAR(SYSDATE, 'MM')   || '月 '
+     || TO_CHAR(SYSDATE, 'DD')   || '日 '  
+     || TO_CHAR(SYSDATE, 'HH12') || '時 ' 
+     || TO_CHAR(SYSDATE, 'MI')   || '分 ' 
+     || TO_CHAR(SYSDATE, 'SS')   || '秒 '
+     || CASE TO_CHAR(SYSDATE,'DY')
+        WHEN '일' THEN '日'
+        WHEN '월' THEN '月'
+        WHEN '화' THEN '火'
+        WHEN '수' THEN '水'
+        WHEN '목' THEN '木'
+        WHEN '금' THEN '金'
+        WHEN '토' THEN '土'
+        END                      || '曜日 '
+     || DECODE( TO_CHAR(SYSDATE, 'AM'),  '오전', '午後',
+                                         '오후', '午後' 
+        )
+FROM DUAL;
 
 -- 1) TO_CHAR 활용
 SELECT  SYSDATE,
@@ -215,7 +238,8 @@ FROM EMPLOYEES;
 --------------------------------------------------------------------------------
 -- 집계함수 : AGGREGATE 함수
 -- 모든 집계함수는 NULL 값은 포함하지 않는다
--- SUM(), AVG(), MIN(), MAX(), COUNT(), VARIANCE()
+-- SUM(), AVG(), MIN(), MAX(), COUNT(), SEDDEV(), VARIANCE()
+-- 합계   평균   최소   최대    줄수    표준편차    분산
 -- 그루핑 : GROUP BY
 -- ~별 인원수 
 
@@ -266,11 +290,92 @@ SELECT COUNT(DISTINCT  department_id)
 FROM   EMPLOYEES; -- 11줄
 
 -- 직원이 근무하는 부서의 수 : 부서장이 있는 부서수 : DEPARTMENTS 부서에서
-SELECT 
-FORM   DEPARMENTS;
+SELECT COUNT(DISTINCT DEPARTMENT_ID) "직원이 있는 부서 수" FROM   DEPARTMENTS ; -- 27
+SELECT COUNT(DISTINCT MANAGER_ID)    "부서장이 있는 부서수"FROM   DEPARTMENTS ; -- 11
+
+-- 직원이 근무하는 부서의 수
+SELECT COUNT( DEPARTMENT_ID)
+FROM DEPARTMENTS
+WHERE MANAGER_ID IS NOT NULL;
+
+
+-- 
+SELECT 7/2,
+       ROUND(156.456, 2), ROUND(156.456, -2), 
+      -- 소수점 반올림123.46 / 소수점 앞 2자리 반올림 100
+       TRUNC(156.456, 2), TRUNC(156.456, -2)
+FROM DUAL;
+
 -- 직원수, 월급합, 월급평균, 최대월급, 최소월급
+SELECT COUNT(employee_id)  직원수   FROM  EMPLOYEES; -- 109
+SELECT SUM(SALARY)         월급합   FROM  EMPLOYEES; -- 691416
+SELECT AVG(SALARY)         월급평균 FROM  EMPLOYEES; -- 6461.831775700934579439252336448598130841
+SELECT MAX(SALARY)         최대월급 FROM  EMPLOYEES; -- 24000
+SELECT MIN(SALARY)         최소월급 FROM  EMPLOYEES; -- 2100
+
+SELECT COUNT(EMPLOYEE_ID)    직원수,
+       SUM(SALARY)           월급합,
+       ROUND(AVG(SALARY), 3) 월급평균,
+       MAX(SALARY)           최대월급,
+       MIN(SALARY)           최소월급
+FROM  EMPLOYEES;       
+       
+       
 -- 부서 60번 부서 인원수, 월급합, 월급평균
+SELECT COUNT(employee_id) 인원수,  -- 5
+       SUM(SALARY)        월급합,  -- 28800
+       AVG(SALARY)        월급평균 -- 5760
+FROM   EMPLOYEES
+WHERE  department_id = 60;
+
+--------------------------------------
+SQL 문의 실행 순서
+1. FROM
+2. WHERE
+3. SELECT
+4. ORDER BY
+--------------------------------------
+
 -- 부서 50, 60, 80번 부서가 아닌 인원수, 월급합, 월급평균
+SELECT COUNT(DEPARTMENT_id)   인원수,  -- 22 = ( 109 - ( 45 + 05 + 34 ) )-3(NULL 3명)
+       SUM(SALARY)            월급합,  -- 194716
+       ROUND(AVG(SALARY), 3)  월급평균 -- 8850.727
+FROM   EMPLOYEES
+WHERE  department_id <> 50 -- 45명
+AND    department_id != 60 -- 05명
+AND    department_id != 80;-- 34명
+-- SELECT COUNT(*)
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID = 80;
+
+
+SELECT COUNT(DEPARTMENT_id)   인원수,  -- 22 = ( 109 - ( 45 + 05 + 34 ) )-3(NULL 3명)
+       SUM(SALARY)            월급합,  -- 194716
+       ROUND(AVG(SALARY), 3)  월급평균 -- 8850.727
+FROM   EMPLOYEES
+WHERE DEPARTMENT_ID NOT IN(50, 60, 80);
+
+----------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
