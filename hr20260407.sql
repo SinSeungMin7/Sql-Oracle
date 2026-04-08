@@ -366,7 +366,7 @@ ORDER BY 부서번호 ASC;
 -- 한자로 출력
 SELECT  employee_id                     사번,
         first_name || ' ' || last_name  이름,
-       TO_CHAR( hire_date,'YYYY"年"-MM"月"-DD"日"HH:MI:SS AM DAY')입사일
+        TO_CHAR( hire_date,'YYYY"年"-MM"月"-DD"日"HH:MI:SS AM DAY') 입사일
 FROM    EMPLOYEES; 
 
 
