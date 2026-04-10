@@ -174,15 +174,17 @@
 7) TRANSLATE()
   - 암호화와 복호화를 처리할때 사용한다
  --------------------------------------------------------------------------------------
- -- 날짜 함수
+ -- 날짜 함수 
 ① SYSDATE, SYSTIMESTAMP
 
 ② ADD_MONTHS (date, integer)
  -- ADD_MONTHS 함수는 매개변수로 들어온 날짜에 interger 만큼의 월을 더한 날짜를 반환한다.
-
+   SELECT ADD_MONTHS(SYSDATE, 1), ADD_MONTHS(SYSDATE, -1)  FROM DUAL;
+   -- 시스템상 현재 달에 1을 더하거나 1을뺀다
+   
 ③ MONTHS_BETWEEN(date1, date2) 
  -- MONTHS_BETWEEN 함수는 두 날짜 사이의 개월 수를 반환하는데, date2가 date1보다 빠른 날짜가 온다.
-
+  
 ④ LAST_DAY(date)
  -- LAST_DAY는 date 날짜를 기준으로 해당 월의 마지막 일자를 반환한다.
 
@@ -191,12 +193,12 @@
 
 ⑥ NEXT_DAY (date, char)
  -- NEXT_DAY는 date를 char에 명시한 날짜로 다음 주 주중 일자를 반환한다.
-
 ------------------------------------------------------------------------------------------------
 https://thebook.io/006696/0113/
 -- 변환 함수
 ① TO_CHAR (숫자 혹은 날짜, format)
-  -- 숫자나 날짜를 문자로 변환해 주는 함수가 바로 TO_CHAR로, 매개변수로는 숫자나 날짜가 올 수 있고 반환 결과를 특정 형식에 맞게 출력할 수 있다.
+  -- 숫자나 날짜를 문자로 변환해 주는 함수가 바로 TO_CHAR로,
+  -- 매개변수로는 숫자나 날짜가 올 수 있고 반환 결과를 특정 형식에 맞게 출력할 수 있다.
     SELECT TO_CHAR(123456789, '999,999,999'),  -- 123,456,789
            TO_CHAR(1234567,    '99,999,999'),  -- 1,234,567
            TO_CHAR(1234567,    '00,000,000'),  -- 01,234,567
@@ -206,10 +208,13 @@ https://thebook.io/006696/0113/
            TO_CHAR(123456789, 'L999,999,999')  -- ￦123,456,789
     FROM DUAL;
     
+    시스탬상 오늘 날짜
     SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD') FROM DUAL; -- 2026-04-10
     
 ② TO_NUMBER(expr, format)
   -- 문자나 다른 유형의 숫자를 NUMBER 형으로 변환하는 함수다.
+   SELECT TO_NUMBER('123456') FROM DUAL;
+   문자로 쓰여진 '123456'을 숫자형태로 변환
   
 ③ TO_DATE(char, format), TO_TIMESTAMP(char, format)
   /* 문자를 날짜형으로 변환하는 함수다. 형식 매개변수로는 [표 4-1]에 있는 항목이 올 수 있으며,
@@ -219,10 +224,18 @@ https://thebook.io/006696/0113/
 NULL 관련 함수
 ① NVL(expr1, expr2), NVL2((expr1, expr2, expr3)
  -- NVL 함수는 expr1이 NULL일 때 expr2를 반환한다.
+ -- NVL2 는 NVL을 확장한 개념 expr1이 null 이 아니면 expr2를, null 이면 expr3을 반환
+ 
 ② COALESCE (expr1, expr2, …)
  -- COALESCE 함수는 매개변수로 들어오는 표현식에서 NULL이 아닌 첫 번째 표현식을 반환하는 함수다.
+  SELECT   employee_id, salary, commission_pct,
+  COALESCE (salary * commission_pct, salary) AS salary2
+  FROM     employees;
+  -- 급여 커미션 값이 null이면 salary를 , null 이 아니면 '급여*커미션' 반환
+  -- NULL 과 수식 연산자를 사용해 NULL과 연산을 하면 상대값이 무엇이든 무조건 NULL 반환
 ③ LNNVL(조건식)
  -- LNNVL은 매개변수로 들어오는 조건식의 결과가 FALSE
+ 
 ④ NULLIF (expr1, expr2)
  -- NULLIF 함수는 expr1과 expr2을 비교해 같으면 NULL을, 같지 않으면 expr1을 반환한다.
 ------------------------------------------------------------------------------------
