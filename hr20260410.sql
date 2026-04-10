@@ -1,14 +1,15 @@
 -- 함수
 - 숫자 함수
-1) ABS()
+① ABS(n)
     ABS 함수는 매개변수로 숫자를 받아 그 절대값을 반환하는 함수다.
     SELECT ABS(10), ABS(-10), ABS(-10.123)  FROM DUAL;
    -- 결과값 10        10          10.123
    
-2) CEIL(n)과 FLOOR(n) -> 결과 정수형
+② CEIL(n)과 FLOOR(n) -> 결과 정수형
   • CEIL     : 무조건 올림
+   - CEIL 함수는 매개변수 n과 같거나 가장 큰 정수를 변환한다
   • FLOOR(n) : 버림
-   
+   - floor 함수는 ceil 함수와는 반대로 매개변수 n 보다 작거나 가장 큰 정수를 변환한다
    SELECT CEIL(10.123), CEIL(10.541), CEIL(11.001) FROM DUAL;
    -- 결과값     11            11            12 
    
@@ -21,10 +22,17 @@
    SELECT TRUNC(-10.123), TRUNC(-10.541), TRUNC(-11.001) FROM DUAL;
    -- 결과값      -10             -10             -11 
    
-3) ROUND(n, i)와 TRUNC(n1, n2)
+③ ROUND(n, i)와 TRUNC(n1, n2)
+    - ROUND 함수는 매개변수 n을 소수점 기준 (i + 1)번 째에서 반올림한 결과를 반환한다.
+      i는 생략할 수 있고 디폴트 값은 0, 즉 소수점 첫 번째 자리에서 반올림이 일어나 정수 부분의 일의 자리에 결과가 반영된다
+     
+    - TRUNC 함수는 반올림을 하지 않고 n1을 소수점 기준 n2 자리에서 무조건 잘라낸 결과를 반환한다.
+            '양수'일때는 소수점 기준 오른쪽, '음수'일떄는 소수점 기준 왼쪽 자리에서 잘라낸다
+            
     ROUND(n, i) n의 i 번째 자리수 까지 표현 단 i번째 자리수는 i 뒷자리를 반올림 하여 표현한다
     ex) ROUND(10.154, 1) : 10.2  -> 10.15의 0.05를 반올림하여 10.2가 나옴
     ex) ROUND(10.154, 2) : 10.15 -> 10.154의 0.004를 반올림하여 10.15가 나옴
+
    SELECT ROUND(10.154, 1), ROUND(10.154, 2), ROUND(10.154, 3) FROM DUAL;
    -- 결과값      10.2              10.15            10.154     
    
@@ -37,8 +45,10 @@
    SELECT TRUNC(0, 3), TRUNC(115.155, -1), TRUNC(115.155, -2) FROM DUAL;
    -- 결과값     0               110                 100      
 
-4) POWER(n2, n1)와 SQRT(n)
-    SQRT(n) : 제곱근 : SQUARE ROOT
+④ POWER(n2, n1)와 SQRT(n)
+    - SQRT(n) : 제곱근 : SQUARE ROOT
+    - POWER 함수는 n2를 n1 제곱한 결과를 반환한다.
+            n1은 정수, 실수 모두 올수있는데, n2가 음수일때 n1은 정수만 올 수 있다.
    
    SELECT POWER(3, 2), POWER(3, 3), POWER(3, 3.0001), POWER(4, 0.5) FROM DUAL;
    -- 결과값   9              27       27.00...             1.99..
@@ -49,7 +59,10 @@
    SELECT SQRT(2), SQRT(-4) FROM DUAL;
    -- 루트안에 (-)음수를 넣으면 에러가 난다
    
-5) 나머지 MOD(n2, n1)와 REMAINDER(n2, n1)
+⑤ MOD(n2, n1)와 REMAINDER(n2, n1)
+   - MOD 함수는 n2를 n1으로 나눈 나머지 값을 반환한다.
+   - REMAINDER 함수 역시 n2를 n1으로 나눈 나머지 값을 반환하는데,
+               나머지를 구하는 내부적 연산 방법이 MOD함수와는 다르다
   • MOD → n2 - n1 * FLOOR (n2/n1)
   • REMAINDER → n2 - n1 * ROUND (n2/n1)
   
@@ -59,8 +72,11 @@
    SELECT REMAINDER(19,4), REMAINDER(19.123, 4.2) FROM DUAL;
    -- 결과값         -1                 -1.877
 
-6) EXP(n), LN(n) 그리고 LOG(n2, n1)   
-
+⑥ EXP(n), LN(n) 그리고 LOG(n2, n1)
+  - EXP는 지수 함수이다 n의 제곱 값을 반환
+  - LN 함수는 자연 로그 함수로 밑수가 e인 로그 함수이다.
+  - LOG는 n2를 밑수로 하는 n1의 로그 값을 반환한다
+  
     SELECT EXP(2), LN(2.713), LOG(10, 100) FROM DUAL; -- 결과값 7.3890560989306502272304274605750078132,  0.9980550336767946922014710783755035594696, 2  
   
 7) SIN(), COS(), TAN() : DEGREE(각도) -> RADIAN (원주율/180 * 각도) -> 0.01745
@@ -70,12 +86,22 @@
 --------------------------------------------------------------------------------
 
  문자함수  
-1) INITCAP(char), LOWER(char), UPPER(char)
+ - 연산 대상이 문자이며 반환 값은 함수에 따라 문자나 숫자를 반환한다
+ 
+① INITCAP(char), LOWER(char), UPPER(char)
     INITCAP 함수는 매개변수로 들어오는 char의 첫 문자는 대문자로, 나머지는 소문자
     SELECT INITCAP('never say goodbye'), INITCAP('never6say*good가bye') FROM DUAL;
    -- 결과값       Never Say Goodbye              Never6say*Good가Bye
    
-2) CONCAT(char1, char2), SUBSTR(char, pos, len), SUBSTRB(char, pos, len)   
+② CONCAT(char1, char2), SUBSTR(char, pos, len), SUBSTRB(char, pos, len)
+   - CONCAT 함수는 '||' 연산자 처럼 매개변수로 들어오는 두 문자를 붙여 반환한다.
+   
+   - SUBSTR 함수는 문자 함수 중 가장 많이 사용되는 함수,
+            잘라올 대사 문자열 char의 pos번째 문자부터 len 길이만큼 잘라낸 결과 반환
+            pos 값으로 음수가 오면 char 문자열 맨 끝에서 시작한 상대적 위치를 의미
+            len 값이 생략되면 pos번째 문자부터 나머지 모든 문자를 반환한다
+      
+   - SUBSTRB 함수는 문자 개수가 아닌 무자열의 바이트(byte) 수만큼 잘라낸 결과를 반환한다
 -- 알아보기                                
     SELECT CONCAT('I Have', ' A Dream'), 'I Have' || ' A Dream'  FROM DUAL;
    -- 결과값        I Have A Dream           I Have A Dream
@@ -87,7 +113,8 @@
     SELECT SUBSTRB('ABCDEFG', 1, 4), SUBSTRB('가나다라마바사', 1, 4) FROM DUAL;
    -- 결과값           ABCD                      가
    
-3) LTRIM(char, set), RTRIM(char, set)   --왼쪽글 날리기/ 오른쪽글날리기
+③ LTRIM(char, set), RTRIM(char, set)
+  --왼쪽글 날리기 / 오른쪽글날리기
     SELECT LTRIM('ABCDEFGABC', 'ABC'),  -- DEFGABC
            LTRIM('가나다라', '가'),     -- 나다라
            RTRIM('ABCDEFGABC', 'ABC'),  -- ABCDEFG
@@ -98,7 +125,7 @@
            LENGTH( TRIM ( LEADING ' ' FROM '   ABCDEF      ' ) ) --12
     FROM DUAL;
  --------------------------------------------------------------------   
-4) LPAD(expr1, n, expr2), RPAD(expr1, n, expr2)    
+④ LPAD(expr1, n, expr2), RPAD(expr1, n, expr2)
 /* LPAD 함수는 매개변수로 들어온 expr2 문자열(생략할 때 디폴트는 공백 한 문자)을
    n자리만큼 왼쪽부터 채워 expr1을 반환하는 함수다.
    매개변수 n은 expr2와 expr1이 합쳐져 반환되는 총 자릿수를 의미한다.*/
@@ -118,7 +145,7 @@
     SELECT RPAD(phone_num, 12, '(02)') FROM ex4_1;
     -- 오른쪽에 (02) 입력해줌 (실제 데이터가 바뀌는것은 아니다)
 
-5) REPLACE(char, search_str, replace_str), TRANSLATE(expr, FROM_str, to_str)    
+⑤ REPLACE(char, search_str, replace_str), TRANSLATE(expr, FROM_str, to_str)
    /* REPLACE 함수는 char 문자열에서 search_str 문자열을 찾아
       이를 replace_str 문자열로 대체한 결과를 반환하는 함수다.*/
      SELECT REPLACE('나는 너를 모르는데 너는 나를 알겠는가?', '나', '너')  FROM DUAL;
@@ -129,7 +156,7 @@
      FROM DUAL;
    
    
-6) INSTR(str, substr, pos, occur),--indexOf()
+⑥ INSTR(str, substr, pos, occur),--indexOf()
     LENGTH(chr)  -- 글자수
     LENGTHB(chr) -- 바이트
 /*  INSTR 함수는 str 문자열에서 substr과 일치하는 위치를 반환하는데, 
@@ -143,6 +170,9 @@
     SELECT LENGTH('대한민국'),  -- 4 글자
            LENGTHB('대한민국')  -- 12 BYTE
     FROM DUAL;
+    
+7) TRANSLATE()
+  - 암호화와 복호화를 처리할때 사용한다
  --------------------------------------------------------------------------------------
  -- 날짜 함수
 ① SYSDATE, SYSTIMESTAMP
