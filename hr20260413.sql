@@ -36,7 +36,10 @@ BEGIN
 END;
 /
 
+-- ORCLE 로 프로시저를 생성한다
 저장 프로시저( IN : INPUT, OUT : OUTPUT, INOUT : INPUTOUT)
+-- 파라미터는  IN_EMPID IN NUMBER   괄호와 숫자 사용하지 않는다
+-- 내부변수는  V_SAL   NUMBER(8, 2) 반드시 괄호와 숫자가 필요하다
 CREATE OR REPLACE PROCEDURE GET_EMPSAL( IN_EMPID IN NUMBER )
 IS 
    V_NAME  VARCHAR2( 46 );
@@ -52,30 +55,119 @@ IS
   END;
 /
 
--- ORCLE 로 프로시저를 생성한다
+테스트
+SET  SERVEROUTPUT ON; -- DBMS_OUTPUT.PUT_LINE()의 결과를 화면에 출력
+CALL GET_EMPSAL( 107 );
+--------------------------------------------------------------------------------
 
 -- 부서번호입력, 해당부서의 최고월급자의 이름, 월급 출력
-SELECT  first_name || ' ' || last_name 이름,
-        salary                         월급,
-        department_id                  부서번호
-FROM    EMPLOYEES
-WHERE   SALARY = (
-          SELECT  MAX( SALARY )
-          FROM    EMPLOYEES
-          WHERE   DEPARTMENT_ID = 30
-           )
-AND   DEPARTMENT_ID = 30;      
+CREATE OR REPLACE PROCEDURE GET_NAME_MAXSAL( 
+    IN_DEPTID   IN    NUMBER,
+    OUT_NAME    OUT   VARCHAR2,
+    OUT_SAL     OUT   NUMBER
+)
+ IS
+    V_MAXSAL   NUMBER(8, 2);
+    BEGIN
+        SELECT  MAX(salary)
+        INTO    V_MAXSAL
+        FROM    EMPLOYEES
+        WHERE   DEPARTMENT_ID = IN_DEPTID;     
+        
+        SELECT first_name || ' ' || last_name, salary
+        INTO   OUT_NAME, OUT_SAL
+        FROM   EMPLOYEES
+        WHERE  SALARY = V_MAXSAL
+        AND    DEPARTMENT_ID = IN_DEPTID;      
+        
+        DBMS_OUTPUT.PUT_LINE( OUT_NAME );
+        DBMS_OUTPUT.PUT_LINE( OUT_SAL );
+/*        
+CREATE OR REPLACE PROCEDURE GET_NAME_MAXSAL( 
+    IN_DEPTID   IN    NUMBER,
+    OUT_NAME    OUT   VARCHAR2,
+    OUT_SAL     OUT   NUMBER
+)
+IS
+BEGIN
+    SELECT  first_name || ' ' || last_name, salary
+    INTO    OUT_NAME, OUT_SAL
+    FROM    EMPLOYEES
+    WHERE   SALARY = (
+                      SELECT  MAX( SALARY )
+                      FROM    EMPLOYEES
+                      WHERE   DEPARTMENT_ID = IN_DEPTID
+                     )
+    AND     DEPARTMENT_ID = IN_DEPTID;
+    
+        DBMS_OUTPUT.PUT_LINE( OUT_NAME );
+        DBMS_OUTPUT.PUT_LINE( OUT_SAL );
+    END;
+    /
+*/ -- 이것도 가능    
+ 테스트 : 90, 60, 50 - 결과가 한줄일때 문제 없다
+ SET SERVEROUTPUT ON;
+ VAR   OUT_NAME VARCHAR2;
+ VAR   OUT_SAL  NUMBER;
+ CALL  GET_NAME_MAXSAL(50, :OUT_NAME, :OUT_SAL);
+ PRINT OUT_NAME;
+ PRINT OUT_SAL;
+ --> JAVA에서 호출해서 쓴다
 
+--------------------------------------------------------------    
+-- 90 번 부서번호입력, 직원들 출력 : 결과가 여러줄일때 에러 발생
+CREATE OR REPLACE PROCEDURE GETEMPLIST( 
+        IN_DEPTID IN NUMBER
+        ) 
+IS
+    V_EMPID NUMBER(6);
+    V_FNAME VARCHAR2(20); 
+    V_LNAME VARCHAR2(25);
+    V_PHONE VARCHAR2(20);
+  BEGIN
+    SELECT employee_id, first_name, last_name, phone_number
+    INTO   V_EMPID,     V_FNAME,      V_LNAME,  V_PHONE
+    FROM   EMPLOYEES
+    WHERE  DEPARTMENT_ID = IN_DEPTID;
+    
+    DBMS_OUTPUT.PUT_LINE(V_EMPID);
+  END;
+  /
+-- 테스트
+SET   SERVEROUTPUT ON;
+EXECUTE  GETEMPLIST( 90 );
 
--- 90 번 부서번호입력, 직원들 출력
-SELECT  employee_id                    사번,
-        first_name || ' ' || last_name 이름,
-        department_id                  부서번호
-FROM    EMPLOYEES 
-WHERE   DEPARTMENT_ID = 90;
+*
+오류 발생 행: 1:
+ORA-01422: 실제 인출은 요구된 것보다 많은 수의 행을 추출합니다
+ORA-06512: "HR.GETEMPLIST",  10행
+ORA-06512:  1행
 
+결과가  3줄인데 한번만 출력햇음
+*** SELECT INTO 는 결과가 한줄일때만 사용가능
 
+해결책) 커서( CURSOR ) 사용
 
+-- 90 번 부서번호입력, 직원들 출력 : 결과가 여러줄일때 정상작동
+CREATE OR REPLACE PROCEDURE GET_EMPLIST( 
+        IN_DEPTID IN NUMBER,
+        OUT_CURSOR OUT SYS_REFCURSOR
+        ) 
+IS
+  BEGIN
+  
+    OPEN OUT_CURSOR FOR
+        SELECT employee_id, first_name, last_name, phone_number
+        FROM   EMPLOYEES
+        WHERE  DEPARTMENT_ID = IN_DEPTID;
+    
+  END;
+  /
+
+-- 테스트
+VARIABLE OUT_CURSOR REFCURSOR;
+EXECUTE  GET_EMPLIST( 50, :OUT_CURSOR )
+PRINT    OUT_CURSOR;
 
 
 
