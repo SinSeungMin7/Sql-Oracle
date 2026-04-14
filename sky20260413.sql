@@ -5,17 +5,29 @@ CREATE
 ALTER
 DROP
 
+CMD
 계정생성
  아이디   : SKY
  비밀번호 : 1234
-CMD
-SQL> conn /as sysdba
+ CMD
+ 
+Microsoft Windows [Version 10.0.19045.6466]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\GG>sqlplus /nolog
+
+SQL*Plus: Release 21.0.0.0.0 - Production on 월 4월 13 14:06:14 2026
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> conn sys/1234 as sysdba
 연결되었습니다.
 
 SQL> show user
 USER은 "SYS"입니다
 
-SQL> alter session set "_ORACLE_SCRIPT"=true;
+SQL> ALTER SESSION SET "_ORACLE_SCRIPT"=true;
 세션이 변경되었습니다.
 
 SQL> CREATE USER SKY IDENTIFIED BY 1234;
@@ -34,7 +46,7 @@ SQL> CONN SKY/1234
 SQL> SHOW USER
 USER은 "SKY"입니다
 
-SQL> 
+SQL>
 -------------------------------------------------------------------------
 새 계정으로 접속한 뒤에 작업
 
