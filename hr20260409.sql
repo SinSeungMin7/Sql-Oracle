@@ -520,8 +520,9 @@ SELECT DEPARTMENT_ID, DEPARTMENT_NAME FROM DEPARTMENTS;
 -- 직원명, 담당업무, 담당업무 히스토리
 
 -- 사번, 업무시작일, 업무종료일, 담당업무, 부서번호
-SELECT employee_id, 
-FROM  EMPLOYEES;
+SELECT employee_id, TO_CHAR(LAST_DAY(hire_date), 'YYYY-MM-DD'),  department_id FROM   EMPLOYEES
+UNION
+SELECT DEPARTMENT
 
 
 

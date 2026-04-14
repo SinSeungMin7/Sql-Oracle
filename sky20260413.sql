@@ -1,5 +1,5 @@
 DDL : data definition language
- 구조를 생성, 변경, 제거
+ 구조를 생성(CREATE), 변경(ALTER), 제거(DROP)
  
 CREATE 
 ALTER
@@ -63,8 +63,10 @@ SQL> GRANT SELECT ON EMPLOYEES TO SKY;
 3. sky 로 로그인한다
 SQL> CONN SKY/1234
 연결되었습니다.
+
 SQL> SHOW USER
 USER은 "SKY"입니다
+
 SQL> SELECT * FROM TAB;
 선택된 레코드가 없습니다.
 
@@ -76,7 +78,7 @@ SELECT * FROM HR.DEPARTMENTS;    -- 조회 실패
 ORACLE 의 TABLE 을 복사하기
 HR 의 EMPLOYEES TABLE 을 복사해서 SKY 로 가져온다
 
-[1] 테이블 생성
+[1] 테이블 생성 - CREATE
 1. 테이블 복사
   대상 : 테이블 구조, 데이터 (제약 조건의 일부만 복사(NO NULL))
   
@@ -119,21 +121,104 @@ HR 의 EMPLOYEES TABLE 을 복사해서 SKY 로 가져온다
                 DEPARTMENT_ID                  DEPTID
         FROM    HR.EMPLOYEES;
 
+SELECT * FROM TAB;
 
 
+--------------------------------------------------------------------------------
+2. SQL DEVELOPER 메뉴에서 TABLE 생성
+    SKY 계정
+        테이블 메뉴클릭 -> 새 테이블 클릭 -> TABLE1 생성 : EMP6
+          EMPID NUMBER(8,2)    NOT NULL  PRIMARY KEY
+        , ENAME VARCHAR2(46) 
+        , TEL   VARCHAR2(20)   NOT NULL 
+        , EMAIL VARCHAR2(320)  NOT NULL 
 
 
+3. SCRIPT 로 생성
+CREATE TABLE EMP7
+(
+  EMPID  NUMBER(8,2)   NOT NULL 
+, ENAME  VARCHAR2(46)  NOT NULL 
+, TEL    VARCHAR2(20)  
+, EMAIL  VARCHAR2(320) 
+, CONSTRAINT EMP7_PK PRIMARY KEY 
+  (
+    EMPID 
+  )
+  ENABLE 
+);
 
+[2] 테이블 제거 - 영구적으로 구조와 데이터가 제거된다 - DROP
 
+  DROP TABLE EMP1; --잘 삭제된다
+    -- DROP 되는 테이블이 부모테이블일 경우 자식을 먼저 지워야 제거가 가능
 
+  DROP TABLE EMPLOYEES; -- 삭제 안됨
+  ORA-02449: 외래 키에 의해 참조되는 고유/기본 키가 테이블에 있습니다
 
+ 테이블이 삭제되지 않는다 : 부모키를 가진 부모테이블은 자식 테이블에 데이터가 있다면  
 
+DROP TABLE EMPLOYEES CASACDE; -- 부모자식 관계를 무시하고 삭제
 
+[3] 구조변경 - ALTER
+    1. 칼럼 추가
+       ALTER TABLE EMP5
+       ADD ( LOC VARCHAR2(6) ); -- 추가된 칼럼은 NULL 로 채워짐
+       
+    2. 칼럼 제거
+       ALTER TABLE EMP5
+        DROP COLUMN LOC;
+        
+    3. 테이블 이름을 변경 - ORACLE 명령
+       RENAME EMP4 TO NEWEMP;
+       
+    4. 칼럼속성변경 -- 크기를 늘려주거나 줄인다
+       ALTER TABLE EMP5
+        MODIFY ( ENAME VARCHAR2(60) ); -- 46자리 -> 60 으로 늘어났다
+      줄일때 데이터의 내용이 있으면 내용이 짤려나갈 수 있다.
 
+------------------------------------------------------------------------
+테이블을 생성하고 데이터를 파일에서 가져온다
 
+CREATE TABLE ZIPCODE
+(
+    ZIPCODE   VARCHAR2(7)               -- 우편번호
+    ,SIDO     VARCHAR2(6)               -- 시도
+    ,GUGUN    VARCHAR2(26)              -- 구군
+    ,DONG     VARCHAR2(78)              -- 읍면동리건물명
+    ,BUNJI    VARCHAR2(26)              -- 번지
+    ,SEQ      NUMBER(5)     PRIMARY KEY -- 일련번호
+                       -- PRIMARY KEY : 중복되지않는(학번, 사번 같은것)
+);
 
+테이블 생성후 ZIPCODE 테이블 선택하고
+ 오른쪽 마우스 버튼 
+  -> 데이터 임포트 클릭
+    ZIPCODE_UTF8.CSV 선택
+    
+SELECT * FROM ZIPCODE;    
 
+SELECT COUNT(*) FROM ZIPCODE; -- 총 줄수 새는것
 
+SELECT COUNT(*) FROM ZIPCODE
+WHERE SIDO = '부산';
 
+-- 시도별 우편번호 갯수
+SELECT    SIDO 시도,
+          COUNT(ZIPCODE) 우편번호갯수
+FROM      ZIPCODE
+GROUP BY  SIDO;
+ 
+SELECT COUNT(ZIPCODE),
+       COUNT(DISTINCT ZIPCODE) -- DISTINCT 중복제거 
+FROM   ZIPCODE;
 
+SELECT '['   || ZIPCODE || ']' ||
+       SIDO  || ' ' ||
+       GUGUN || ' ' ||
+       DONG  || ' ' ||
+       BUNJI || ' ' AS ADDRESS
+FROM   ZIPCODE
+WHERE  DONG LIKE '%부전2동%'
+ORDER BY SEQ ASC;
 

@@ -82,7 +82,18 @@ CREATE OR REPLACE PROCEDURE GET_NAME_MAXSAL(
         
         DBMS_OUTPUT.PUT_LINE( OUT_NAME );
         DBMS_OUTPUT.PUT_LINE( OUT_SAL );
-/*        
+        END;
+        /
+        
+ 테스트 : 90, 60, 50 - 결과가 한줄일때 문제 없다
+ SET SERVEROUTPUT ON;
+ VAR   OUT_NAME VARCHAR2;
+ VAR   OUT_SAL  NUMBER;
+ CALL  GET_NAME_MAXSAL(50, :OUT_NAME, :OUT_SAL);
+ PRINT OUT_NAME;
+ PRINT OUT_SAL;
+ 
+-- 위 아래 같은 결과 이것도 가능    
 CREATE OR REPLACE PROCEDURE GET_NAME_MAXSAL( 
     IN_DEPTID   IN    NUMBER,
     OUT_NAME    OUT   VARCHAR2,
@@ -103,8 +114,8 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE( OUT_NAME );
         DBMS_OUTPUT.PUT_LINE( OUT_SAL );
     END;
-    /
-*/ -- 이것도 가능    
+/
+
  테스트 : 90, 60, 50 - 결과가 한줄일때 문제 없다
  SET SERVEROUTPUT ON;
  VAR   OUT_NAME VARCHAR2;
@@ -169,14 +180,7 @@ VARIABLE OUT_CURSOR REFCURSOR;
 EXECUTE  GET_EMPLIST( 50, :OUT_CURSOR )
 PRINT    OUT_CURSOR;
 
-
-
-
-
-
-
-
-
+--------------------------------------------------------------------------------
 
 
 
