@@ -228,7 +228,6 @@ DML 추가, 수정, 삭제 -- COMMIT 필수
   DROP TABLE STUDENT; -- STUDENT 테이블 삭제
  -------------------------------------------------------
  
- 
  성적처리 TABLE
  업무
  학생 : 학번, 이름, 전화, 입학일
@@ -238,14 +237,71 @@ DML 추가, 수정, 삭제 -- COMMIT 필수
  -----------------------------------------------------------------------------
  -- 조회
  1. 학번, 이름, 점수(국어)
- 
+    SELECT st.stid    학번,
+           st.stname  이름,
+           sc.score   
+    FROM   STUDENT ST JOIN SCORES SC ON ST.STID = SC.STID
+    WHERE  SC.SUBJECT = '국어';
+    
  2. 학번, 이름, 총점, 평균
+    SELECT st.stid                       학번,
+           st.stname                     이름,
+           SUM(sc.score)                 총점,
+           ROUND( (SUM(sc.score)/3),3)   평균
+    FROM   STUDENT ST LEFT JOIN SCORES SC ON ST.STID = SC.STID
+    GROUP BY ST.STID, ST.STNAME
+    ORDER BY 학번 ;
+    
+    SELECT * FROM SCORES;
+    
  3. 모든 학생의 학번, 이름, 총점, 평균
     점수가 NULL인 학생은'미응시'
+    SELECT st.stid                                                학번,
+           st.stname                                              이름,
+           NVL( TO_CHAR ( SUM (sc.score) ), '미응시')             총점,
+           NVL( TO_CHAR (ROUND( (SUM(sc.score)/3),3)), '미응시')  평균
+    FROM   STUDENT ST LEFT JOIN SCORES SC ON ST.STID = SC.STID
+    GROUP BY ST.STID, ST.STNAME
+    ORDER BY 학번;
+    
  4. 모든 학생의 학번, 이름 ,총점, 평균, 등급, 석차
- SELECT
- FROM    
- 
+    SELECT st.stid                                                  학번,
+           st.stname                                                이름,
+           NVL( TO_CHAR ( SUM (sc.score) ), '미응시')               총점,
+           NVL( TO_CHAR (ROUND( (SUM(sc.score)/3),3)), '미응시')    평균,
+           CASE                                                   
+                WHEN (SUM(sc.score)/3) >= 90  THEN 'A'
+                WHEN (SUM(sc.score)/3) >= 80  THEN 'B'
+                WHEN (SUM(sc.score)/3) >= 70  THEN 'C'
+                WHEN (SUM(sc.score)/3) >= 60  THEN 'D'
+                WHEN (SUM(sc.score)/3) IS NULL THEN '미응시'
+                ELSE 'F'
+           END                                                       등급,
+           RANK() OVER (ORDER BY (SUM(sc.score)/3) DESC NULLS LAST ) 석차
+    FROM   STUDENT ST LEFT JOIN SCORES SC ON ST.STID = SC.STID
+    GROUP BY ST.STID, ST.STNAME
+    ORDER BY 학번;
+    
+---- 학번, 이름, 국어, 영어, 수학, 총점, 평균 등급, 석차
+    SELECT st.stid                                                  학번,
+           st.stname                                                이름,
+           sc.subject = '국어'                                      국어,
+           sc.subject = '영어'                                      영어,
+           sc.subject = '수학'                                      수학,
+           NVL( TO_CHAR ( SUM (sc.score) ), '미응시')               총점,
+           NVL( TO_CHAR (ROUND( (SUM(sc.score)/3),3)), '미응시')    평균,
+           CASE                                                   
+                WHEN (SUM(sc.score)/3) >= 90  THEN 'A'
+                WHEN (SUM(sc.score)/3) >= 80  THEN 'B'
+                WHEN (SUM(sc.score)/3) >= 70  THEN 'C'
+                WHEN (SUM(sc.score)/3) >= 60  THEN 'D'
+                WHEN (SUM(sc.score)/3) IS NULL THEN '미응시'
+                ELSE 'F'
+           END                                                       등급,
+           RANK() OVER (ORDER BY (SUM(sc.score)/3) DESC NULLS LAST ) 석차
+    FROM   STUDENT ST LEFT JOIN SCORES SC ON ST.STID = SC.STID
+    GROUP BY ST.STID, ST.STNAME
+    ORDER BY 학번;
  
  
  
