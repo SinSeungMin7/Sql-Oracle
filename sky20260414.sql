@@ -1,3 +1,4 @@
+
 성적처리 TABLE
  업무
  학생 : 학번, 이름, 전화, 입학일
@@ -21,10 +22,19 @@
   4. CHECK           : 값의 범위지정 , DOMAIN 제약 조건 
   5. FOREIGN KEY     : 외래키 제약조건
   
+  -- 관계가 설정된 테이블 삭제 방법 1
+  -- 테이블 삭제 순서 자식테이블 -> 부모테이블
+  drop table scores;    -- 자식 테이블을 먼저 삭제 해야한다
+  drop table student;   -- 부모 테이블을 나중에 삭제
+  
+  -- 관계가 설정된 테이블 삭제 방법 2
+  DROP TABLE STUDENT CASCADE CONSTRAINTS PURGE; -- 순서에 무관하게 삭제 할때 쓰는 명령어
+  DROP TABLE SCORES;
   
   
  학생     : 학번(PK), 이름,   전화,   입학일
  STUDENT    STID      STNAME  PHONE   INDATE  
+ 
  CREATE     TABLE     STUDENT
  (
     STID    NUMBER(6)     PRIMARY KEY,        -- 학번 숫자(6) 기본키
@@ -138,7 +148,9 @@ select * from student;
  INSERT INTO SCORES VALUES (8,    '수학',    85,   4);
  INSERT INTO SCORES VALUES (9,    '국어',   805,   5); -- ORA-02290: 체크 제약조건(SKY.SYS_C008388)이 위배되었습니다
  INSERT INTO SCORES VALUES (10,   '영어',   100,   8); -- ORA-02291: 무결성 제약조건(SKY.STID_FK)이 위배되었습니다- 부모 키가 없습니다
-
+ COMMIT;
+ 
+ 
 DML 추가, 수정, 삭제 -- COMMIT 필수
 1. INSERT(추가) - 줄(DATA) 추가
   1) INSERT INTO SCORES ( SCID, SUBJECT, SCORE, STID )
@@ -235,34 +247,90 @@ DML 추가, 수정, 삭제 -- COMMIT 필수
  과목은 변경될 수 있다.
  
  -----------------------------------------------------------------------------
+ 공부확인용 예제 문제들 
+ 학생/스코어 
+ SELECT * FROM student;
+ SELECT * FROM scores;
+ 
  -- 조회
- 1. 학번, 이름, 점수(국어)
+ 1. 학번, 이름, 점수
     SELECT st.stid    학번,
            st.stname  이름,
            sc.score   
-    FROM   STUDENT ST JOIN SCORES SC ON ST.STID = SC.STID
-    WHERE  SC.SUBJECT = '국어';
+    FROM   STUDENT ST LEFT JOIN SCORES SC
+    ON ST.STID = SC.STID
+    ORDER BY ST.STID ASC;
+    
+    
+ 1.1-2) 
+    SELECT   st.stid    학번,
+             st.stname  이름,
+             sc.score   점수
+    FROM     STUDENT ST, SCORES SC
+    WHERE    ST.STID = SC.STID(+)
+    ORDER BY ST.STID ASC;
     
  2. 학번, 이름, 총점, 평균
+   2-1)
     SELECT st.stid                       학번,
            st.stname                     이름,
            SUM(sc.score)                 총점,
            ROUND( (SUM(sc.score)/3),3)   평균
-    FROM   STUDENT ST LEFT JOIN SCORES SC ON ST.STID = SC.STID
+    FROM   STUDENT ST LEFT JOIN SCORES SC
+    ON ST.STID = SC.STID
     GROUP BY ST.STID, ST.STNAME
     ORDER BY 학번 ;
     
-    SELECT * FROM SCORES;
+    2-2)
+    SELECT   ST.STID                       학번,
+             ST.STNAME                     이름,
+             SUM(SC.SCORE)                 총점,
+             ROUND(AVG(SC.SCORE),2)        평균
+    FROM     STUDENT ST, SCORES SC
+    WHERE    ST.STID = SC.STID(+)
+    GROUP BY ST.STID, ST.STNAME
+    ORDER BY ST.STID ASC, ST.STNAME ASC;
     
  3. 모든 학생의 학번, 이름, 총점, 평균
     점수가 NULL인 학생은'미응시'
+    3-1)
     SELECT st.stid                                                학번,
            st.stname                                              이름,
            NVL( TO_CHAR ( SUM (sc.score) ), '미응시')             총점,
            NVL( TO_CHAR (ROUND( (SUM(sc.score)/3),3)), '미응시')  평균
-    FROM   STUDENT ST LEFT JOIN SCORES SC ON ST.STID = SC.STID
+    FROM   STUDENT ST LEFT JOIN SCORES SC
+    ON ST.STID = SC.STID
     GROUP BY ST.STID, ST.STNAME
     ORDER BY 학번;
+    
+    3-2)
+    SELECT   ST.STID                                           학번,
+             ST.STNAME                                         이름,
+             DECODE(SUM(SC.SCORE),NULL,'미응시',SUM(SC.SCORE)) 총점,  -- NULL 이라면 '미응시' 아니라면 SUM(SC.SCORE) 출력
+             CASE         
+               WHEN ROUND(AVG(SC.SCORE),2) IS NULL THEN   '미응시'
+               ELSE              TO_CHAR( AVG(SC.SCORE),'999.00' )      
+             END                                               평균
+    FROM     STUDENT ST, SCORES SC
+    WHERE    ST.STID = SC.STID(+)
+    GROUP BY ST.STID, ST.STNAME
+    ORDER BY ST.STID ASC, ST.STNAME ASC;
+    
+    3-3)
+    SELECT 학번,
+           이름,
+           DECODE (총점, NULL, '미응시', TO_CHAR(총점, '990')),
+           DECODE (총점, NULL, '미응시', TO_CHAR(평균, '990.00'))
+    FROM (
+            SELECT st.stid                                                학번,
+                   st.stname                                              이름,
+                   NVL( TO_CHAR ( SUM (sc.score) ), '미응시')             총점,
+                   NVL( TO_CHAR (ROUND( (SUM(sc.score)/3),3)), '미응시')  평균
+            FROM   STUDENT ST LEFT JOIN SCORES SC
+            ON ST.STID = SC.STID
+            GROUP BY ST.STID, ST.STNAME
+            ORDER BY 학번;
+    )
     
  4. 모든 학생의 학번, 이름 ,총점, 평균, 등급, 석차
     SELECT st.stid                                                  학번,
@@ -282,7 +350,7 @@ DML 추가, 수정, 삭제 -- COMMIT 필수
     GROUP BY ST.STID, ST.STNAME
     ORDER BY 학번;
     
----- 학번, 이름, 국어, 영어, 수학, 총점, 평균 등급, 석차
+ 5. 학번, 이름, 국어, 영어, 수학, 총점, 평균 등급, 석차
     SELECT st.stid                                                  학번,
            st.stname                                                이름,
            sc.subject = '국어'                                      국어,
